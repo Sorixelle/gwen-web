@@ -303,8 +303,8 @@ class WebContext(env: WebEnvContext, driverManager: DriverManager) extends WebEl
       try {
         withWebElement(elementBinding) { webElement =>
           result = state match {
-            case "displayed" => webElement.isDisplayed
-            case "hidden" => !webElement.isDisplayed
+            case "displayed" => isDisplayed(webElement)
+            case "hidden" => !isDisplayed(webElement)
             case "checked" | "ticked" => webElement.isSelected
             case "unchecked" | "unticked" => !webElement.isSelected
             case "enabled" => webElement.isEnabled

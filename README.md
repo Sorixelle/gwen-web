@@ -74,7 +74,7 @@ Runtime Requirements
 --------------------
 
 - Java SE 8+ Runtime Environment
-- Chrome, Firefox, IE, or Safari web browser
+- Chrome, Firefox, Edge, IE, or Safari web browser
 
 Key Features
 ------------

@@ -25,6 +25,7 @@ import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.{FirefoxDriver, FirefoxOptions, FirefoxProfile}
 import org.openqa.selenium.ie.{InternetExplorerDriver, InternetExplorerOptions}
+import org.openqa.selenium.edge.{EdgeDriver, EdgeOptions}
 import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.remote.HttpCommandExecutor
@@ -119,6 +120,7 @@ class DriverManager extends LazyLogging {
         case "firefox" => firefoxOptions()
         case "chrome" => chromeOptions()
         case "ie" | "internet explorer" => ieOptions()
+        case "edge" => edgeOptions()
         case "safari" => safariOptions()
         case _ =>
           new MutableCapabilities() tap { caps =>
@@ -141,6 +143,7 @@ class DriverManager extends LazyLogging {
     driverName match {
       case "firefox" => firefox()
       case "ie" => ie()
+      case "edge" => edge()
       case "chrome" => chrome()
       case "safari" => safari()
       case _ => unsupportedWebDriverError(driverName)
@@ -259,6 +262,10 @@ class DriverManager extends LazyLogging {
     setDesiredCapabilities(options)
   }
 
+  private def edgeOptions(): EdgeOptions = new EdgeOptions() tap { options =>
+    setDesiredCapabilities(options)
+  }
+
   private def safariOptions(): SafariOptions = new SafariOptions() tap { options =>
     setDesiredCapabilities(options)
   }
@@ -299,6 +306,13 @@ class DriverManager extends LazyLogging {
       WebDriverManager.iedriver().setup()
     }
     new InternetExplorerDriver(ieOptions())
+  }
+
+  private[web] def edge(): WebDriver = {
+    if (WebSettings.`webdriver.edge.driver`.isEmpty) {
+      WebDriverManager.edgedriver().setup()
+    }
+    new EdgeDriver(edgeOptions())
   }
   
   private[web] def safari(): WebDriver = {
