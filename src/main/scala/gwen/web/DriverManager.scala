@@ -119,7 +119,7 @@ class DriverManager extends LazyLogging {
       browser.trim.toLowerCase match {
         case "firefox" => firefoxOptions()
         case "chrome" => chromeOptions()
-        case "ie" | "internet explorer" => ieOptions()
+        case "ie" => ieOptions()
         case "edge" => edgeOptions()
         case "safari" => safariOptions()
         case _ =>

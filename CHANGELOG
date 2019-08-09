@@ -7,6 +7,7 @@ Aug 9, 2019
   - Click to check and uncheck radio buttons before sending keys as secondary measure
   - Set default capabilities to enable IE driver to function
 - Do not override user provided web capabilities with defaults
+- Report error when locating elements by XPath in IE since it does not support it
 
 2.34.2
 ======
