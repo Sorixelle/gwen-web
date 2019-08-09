@@ -260,12 +260,12 @@ class DriverManager extends LazyLogging {
 
   private def ieOptions(): InternetExplorerOptions = new InternetExplorerOptions() tap { options =>
     def caps = setDesiredCapabilities(options)
-    caps.setCapability("requireWindowFocus", true)
-    caps.setCapability("nativeEvents", false);    
-    caps.setCapability("unexpectedAlertBehaviour", "accept");
-    caps.setCapability("ignoreProtectedModeSettings", true);
-    caps.setCapability("disable-popup-blocking", true);
-    caps.setCapability("enablePersistentHover", true);
+    setDefaultCapability("requireWindowFocus", true, options)
+    setDefaultCapability("nativeEvents", false, options);    
+    setDefaultCapability("unexpectedAlertBehaviour", "accept", options);
+    setDefaultCapability("ignoreProtectedModeSettings", true, options);
+    setDefaultCapability("disable-popup-blocking", true, options);
+    setDefaultCapability("enablePersistentHover", true, options);
   }
 
   private def edgeOptions(): EdgeOptions = new EdgeOptions() tap { options =>
@@ -279,19 +279,28 @@ class DriverManager extends LazyLogging {
   private def setDesiredCapabilities(capabilities: MutableCapabilities): MutableCapabilities = {
     capabilities tap { caps =>
       WebSettings.`gwen.web.capabilities` foreach { case (name, value) =>
-        try {
-          logger.info(s"Setting web capability: $name=$value")
-          caps.setCapability(name, Integer.valueOf(value.trim))
-        } catch {
-          case _: Throwable =>
-            if (value.matches("(true|false)")) caps.setCapability(name, java.lang.Boolean.valueOf(value.trim))
-            else caps.setCapability(name, value)
-        }
+        setCapabilty(name, value, caps);
       }
-      logger.info(s"Setting web capability: ${CapabilityType.ACCEPT_SSL_CERTS}=${WebSettings.`gwen.web.accept.untrusted.certs`}")
-      caps.setCapability(CapabilityType.ACCEPT_SSL_CERTS, WebSettings.`gwen.web.accept.untrusted.certs`)
-      logger.info(s"Setting web capability: javascriptEnabled=true")
-      caps.setCapability("javascriptEnabled", true)
+      setDefaultCapability(CapabilityType.ACCEPT_SSL_CERTS, WebSettings.`gwen.web.accept.untrusted.certs`, caps)
+      setDefaultCapability("javascriptEnabled", true, caps)
+    }
+  }
+
+  private def setDefaultCapability(name: String, value: Any, capabilities: MutableCapabilities) {
+    if (capabilities.getCapability(name) == null) {
+      setCapabilty(name, value, capabilities)
+    }
+  }
+
+  private def setCapabilty(name: String, value: Any, capabilities: MutableCapabilities) {
+    def strValue = String.valueOf(value).trim
+    try {
+      logger.info(s"Setting web capability: $name=$strValue")
+      capabilities.setCapability(name, Integer.valueOf(strValue))
+    } catch {
+      case _: Throwable =>
+        if (strValue.matches("(true|false)")) capabilities.setCapability(name, java.lang.Boolean.valueOf(strValue))
+        else capabilities.setCapability(name, strValue)
     }
   }
   
