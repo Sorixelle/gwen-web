@@ -259,7 +259,13 @@ class DriverManager extends LazyLogging {
   }
 
   private def ieOptions(): InternetExplorerOptions = new InternetExplorerOptions() tap { options =>
-    setDesiredCapabilities(options)
+    def caps = setDesiredCapabilities(options)
+    caps.setCapability("requireWindowFocus", true)
+    caps.setCapability("nativeEvents", false);    
+    caps.setCapability("unexpectedAlertBehaviour", "accept");
+    caps.setCapability("ignoreProtectedModeSettings", true);
+    caps.setCapability("disable-popup-blocking", true);
+    caps.setCapability("enablePersistentHover", true);
   }
 
   private def edgeOptions(): EdgeOptions = new EdgeOptions() tap { options =>
@@ -270,21 +276,23 @@ class DriverManager extends LazyLogging {
     setDesiredCapabilities(options)
   }
 
-  private def setDesiredCapabilities(capabilities: MutableCapabilities) {
-    WebSettings.`gwen.web.capabilities` foreach { case (name, value) =>
-      try {
-        logger.info(s"Setting web capability: $name=$value")
-        capabilities.setCapability(name, Integer.valueOf(value.trim))
-      } catch {
-        case _: Throwable =>
-          if (value.matches("(true|false)")) capabilities.setCapability(name, java.lang.Boolean.valueOf(value.trim))
-          else capabilities.setCapability(name, value)
+  private def setDesiredCapabilities(capabilities: MutableCapabilities): MutableCapabilities = {
+    capabilities tap { caps =>
+      WebSettings.`gwen.web.capabilities` foreach { case (name, value) =>
+        try {
+          logger.info(s"Setting web capability: $name=$value")
+          caps.setCapability(name, Integer.valueOf(value.trim))
+        } catch {
+          case _: Throwable =>
+            if (value.matches("(true|false)")) caps.setCapability(name, java.lang.Boolean.valueOf(value.trim))
+            else caps.setCapability(name, value)
+        }
       }
+      logger.info(s"Setting web capability: ${CapabilityType.ACCEPT_SSL_CERTS}=${WebSettings.`gwen.web.accept.untrusted.certs`}")
+      caps.setCapability(CapabilityType.ACCEPT_SSL_CERTS, WebSettings.`gwen.web.accept.untrusted.certs`)
+      logger.info(s"Setting web capability: javascriptEnabled=true")
+      caps.setCapability("javascriptEnabled", true)
     }
-    logger.info(s"Setting web capability: ${CapabilityType.ACCEPT_SSL_CERTS}=${WebSettings.`gwen.web.accept.untrusted.certs`}")
-    capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, WebSettings.`gwen.web.accept.untrusted.certs`)
-    logger.info(s"Setting web capability: javascriptEnabled=true")
-    capabilities.setCapability("javascriptEnabled", true)
   }
   
   private[web] def chrome(): WebDriver = {

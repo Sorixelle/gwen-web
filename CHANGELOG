@@ -1,9 +1,11 @@
 2.35.0
 ======
-Aug 8, 2019
+Aug 9, 2019
 - Add supoprt for Edge browser
-- Cross browser fixes for brining elements that outside of the visibile vewport into view
-- Cross borwser fixes for checking and unchecking radio buttons
+- Cross browser fixes
+  - Bring elements that are outside of the visibile vewport into view
+  - Click to check and uncheck radio buttons before sending keys as secondary measure
+  - Set default capabilities to enable IE driver to function
 
 2.34.2
 ======
